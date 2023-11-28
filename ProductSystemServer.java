@@ -64,7 +64,7 @@ public class ProductSystemServer {
 			try {
 				
 				//TODO: PrintWrite 객체 this.out, BufferedReader 객체 this.in을 생성하는 코드를 작성하시오. BufferedReader의 인코딩은 UTF-8으로 설정
-				out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), "UTF-8")), true);
+				out = new PrintWriter(connection.getOutputStream());
 				in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
 
 				StringBuilder s=new StringBuilder();
@@ -87,13 +87,13 @@ public class ProductSystemServer {
 						service.getProducts(out,requestParam);
 					}
 					//TODO : POST, PATCH(또는 PUT), DELETE API에 대한 분기처리를 작성하시오
-					else if (request.startsWith("POST /")) {
+					else if (request.indexOf("POST /Product") != -1) {
 						String requestBody = request.split("\r\n\r\n")[1];
 						service.addProduct(out, requestBody);
-					} else if (request.startsWith("PATCH /") || request.startsWith("PUT /")) {
+					} else if (request.indexOf("PATCH /") != -1 || request.indexOf("PUT /") != -1) {
 						String requestBody = request.split("\r\n\r\n")[1];
 						service.updateProduct(out, requestBody);
-					} else if (request.startsWith("DELETE /")) {
+					} else if (request.indexOf("DELETE /") != -1) {
 						String requestParam = request.split(" ")[1].replace("/", "");
 						service.deleteProduct(out, requestParam);
 					}else {

@@ -33,14 +33,13 @@ public class HTTPRequestController {
 		pw.println("GET /"+requestParam+" HTTP/1.1");
 		pw.println("Host: "+host);
 		pw.println();
-		pw.println(requestParam);
 		pw.flush();
 	}
 	
 	
 	public void setPostRequest(PrintWriter pw,String requestBody){
 		//TODO : 상품 추가를 요청하는 POST / API Request를 필수헤더를 포함하여 구성하시오 (O)
-		pw.println("POST /1.1");
+		pw.println("POST /Product HTTP/1.1");
 		pw.println("Host: "+host);
 		pw.println("Content-Type : application/json; charset=utf-8");
 		pw.println("Content-Length :"+requestBody.getBytes().length);

@@ -2,10 +2,7 @@ package problem;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 import com.google.gson.Gson;
@@ -20,7 +17,7 @@ public class MyClientController {
 
 	//private String serverURL="203.252.148.148";
 	private int port = 80;
-	private String serverURL = "localhost";
+	private String serverURL = "220.117.41.205";
 
 	public MyClientController(ProductSystemUI v) {
 		this.v = v;
@@ -92,7 +89,7 @@ public class MyClientController {
 			rc.setGetRequest(pw, v.idInput.getText());
 			socket.shutdownOutput();
 
-			// TODO : Response 내용을 받아오는 코드를 작성하시오 (아마도 완료)
+			// TODO : Response 내용을 받아오는 코드를 작성하시오
 			v.model.setRowCount(0);
 			String line = null;
 			StringBuilder s = new StringBuilder();
@@ -106,21 +103,17 @@ public class MyClientController {
 			// 참고 : ResponseBody 받아오는 방법 -> Response에서 "\r\n\r\n"를 구분자로 split하여 받아옴
 			if (response.indexOf("HTTP/") != -1) {
 				if (response.indexOf("200 OK") != -1) {
-					//TODO: 응답 형식 보고 여기 채워야함 아마 사용자의 학번으로 상품 전부 불러오는듯?
-					String productsJson = response.split("\r\n\r\n")[1];
-					System.out.println(productsJson);
-//					if(productsJson!=null) {
-//						Product[] products = gson.fromJson(productsJson, Product[].class);
-//						for (Product product : products) {
-//							Object[] rowData = new Object[]{
-//									product.getOrderId(),
-//									product.getName(),
-//									product.getStatus(),
-//									product.getCreatedAt()
-//							};
-//							v.model.addRow(rowData);
-//						}
-//					}
+					String productsJsonList = response.split("\r\n\r\n")[1];
+					String[] productJson = productsJsonList.split("\n");
+					Product[] products = new Product[productJson.length];
+
+					for(int i=0; i<products.length; i++){
+						products[i] = gson.fromJson(productJson[i], Product.class);
+					}
+					v.model.setNumRows(0);
+					for(int i=0; i<products.length; i++){
+						v.model.addRow(new Object[]{products[i].getOrderId(), products[i].getName(), products[i].getStatus(), products[i].getCreatedAt()});
+					}
 				}
 			}
 		} catch (IOException e1) {
@@ -153,18 +146,16 @@ public class MyClientController {
 			//request header 세팅
 			rc.setPostRequest(pw, gson.toJson(new Product(v.idInput.getText(), v.nameInput.getText())));
 			socket.shutdownOutput();
-			// TODO : Response 내용을 받아오는 코드를 작성하시오 (일단 아마도)
+			// TODO : Response 내용을 받아오는 코드를 작성하시오
 			String line = null;
 			StringBuilder s = new StringBuilder();
-
 			while ((line = br.readLine()) != null) {
 				s.append(line + "\r\n");
 			}
 			String response = s.toString();
 
-			// TODO : 올바른 Response일 때 상품을 새로고침 하시오 (상품을 디비에 추가하고 getProduct를 다시 불러서 테이블에?)
-
-
+			// TODO : 올바른 Response일 때 상품을 새로고침 하시오
+			getProducts();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} finally {
@@ -180,7 +171,6 @@ public class MyClientController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
 		}
 	}
 
@@ -210,8 +200,7 @@ public class MyClientController {
 			String response = s.toString();
 
 			// TODO : 올바른 Response일 때 상품을 새로고침 하는 코드를 작성하시오
-
-
+			getProducts();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} finally {
@@ -252,7 +241,7 @@ public class MyClientController {
 			}
 			String response = s.toString();
 			// TODO : 올바른 Response일 때 상품을 새로고침 하는 코드를 작성하시오
-
+			getProducts();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} finally {

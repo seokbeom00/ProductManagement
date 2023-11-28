@@ -49,5 +49,4 @@ public class HTTPResponseController {
 		out.println();
 		out.flush();
 	}
-
 }
