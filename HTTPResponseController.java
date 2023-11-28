@@ -18,7 +18,7 @@ public class HTTPResponseController {
 		out.println("Content-Type: application/json; charset=utf-8");
 		out.println("Content-Length: " + responseBody.getBytes().length);
 		out.println();
-		out.println(responseBody);
+		out.print(responseBody);
 		out.flush();
 	}
 

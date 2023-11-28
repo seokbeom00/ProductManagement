@@ -17,7 +17,7 @@ public class MyClientController {
 
 	//private String serverURL="203.252.148.148";
 	private int port = 80;
-	private String serverURL = "220.117.41.205";
+	private String serverURL = "192.168.65.198";
 
 	public MyClientController(ProductSystemUI v) {
 		this.v = v;
@@ -93,26 +93,31 @@ public class MyClientController {
 			v.model.setRowCount(0);
 			String line = null;
 			StringBuilder s = new StringBuilder();
-
+			int contentLength = -1;
 			while ((line = br.readLine()) != null) {
+				if(line.startsWith("Content-Length: ")){
+					contentLength = Integer.parseInt(line.substring("Content-Length: ".length()).trim());
+				}
 				s.append(line + "\r\n");
 			}
 			String response = s.toString();
 
 			// TODO : 올바른 Response 일 때 상품 조회 이벤트를 처리하시오
 			// 참고 : ResponseBody 받아오는 방법 -> Response에서 "\r\n\r\n"를 구분자로 split하여 받아옴
-			if (response.indexOf("HTTP/") != -1) {
-				if (response.indexOf("200 OK") != -1) {
-					String productsJsonList = response.split("\r\n\r\n")[1];
-					String[] productJson = productsJsonList.split("\n");
-					Product[] products = new Product[productJson.length];
+			if(contentLength != 0) {
+				if (response.indexOf("HTTP/") != -1) {
+					if (response.indexOf("200 OK") != -1) {
+						String productsJsonList = response.split("\r\n\r\n")[1];
+						String[] productJson = productsJsonList.split("\n");
+						Product[] products = new Product[productJson.length];
 
-					for(int i=0; i<products.length; i++){
-						products[i] = gson.fromJson(productJson[i], Product.class);
-					}
-					v.model.setNumRows(0);
-					for(int i=0; i<products.length; i++){
-						v.model.addRow(new Object[]{products[i].getOrderId(), products[i].getName(), products[i].getStatus(), products[i].getCreatedAt()});
+						for (int i = 0; i < products.length; i++) {
+							products[i] = gson.fromJson(productJson[i], Product.class);
+						}
+						v.model.setNumRows(0);
+						for (int i = 0; i < products.length; i++) {
+							v.model.addRow(new Object[]{products[i].getOrderId(), products[i].getName(), products[i].getStatus(), products[i].getCreatedAt()});
+						}
 					}
 				}
 			}
@@ -183,7 +188,7 @@ public class MyClientController {
 			pw = new PrintWriter(socket.getOutputStream());
 
 			//request header 설정 (PUT이 안될 경우 PATCH 사용)
-			rc.setPatchRequest(pw, gson.toJson(
+			rc.setPutRequest(pw, gson.toJson(
 					new Product(Long.parseLong(v.txt1.getText().toString()), v.txt2.getText(), v.txt3.getText())));
 			// rc.setPutRequest(pw, gson.toJson(
 			// new Product(Long.parseLong(v.txt1.getText().toString()), v.txt2.getText(),v.txt3.getText())));

@@ -67,7 +67,6 @@ public class ProductService {
 				content += gson.toJson(new Product(rs.getLong("order_id"), rs.getString("name"), rs.getString("status"),
 						rs.getString("created_at"))) + "\n";
 			}
-//			System.out.println(content);
 			//TODO : 상품 조회 Response를 보내는 코드를 작성하시오
 			hc.setSuccessGetResponse(out, content);
 		} catch (SQLException e) {
@@ -95,7 +94,6 @@ public class ProductService {
 			
 			//TODO : 상품 추가 성공 Response를 보내는 코드를 작성하시오
 			hc.setSuccessPostResponse(out);
-			System.out.print("add complete");
 		} catch (SQLException e) {
 			e.printStackTrace();
 			hc.setFailedResponse(out);
